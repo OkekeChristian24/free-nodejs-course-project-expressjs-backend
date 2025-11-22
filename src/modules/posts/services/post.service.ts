@@ -10,6 +10,7 @@ import {
 import { ExceptionMessages } from "../../../common/messages/exception.message";
 import { CaseCasted } from "../../../common/constants/variables";
 import { RedisService } from "../../../providers/redis.provider";
+import { slowFib } from "../../../common/utils/helpers";
 
 export class PostService {
 	constructor(private pool: Pool, private redisService: RedisService) {}
@@ -126,17 +127,21 @@ export class PostService {
 		return { id };
 	}
 
-	async testRedis(count: number): Promise<{ count: number }> {
+	async testRedis(count: number): Promise<{ result: number }> {
 		const cacheKey = `test:${count}`;
 		const cachedTest = await this.redisService.getCachedItem<number>(cacheKey);
 		if (cachedTest) {
-			return { count: cachedTest[0] };
+			console.log(cachedTest);
+			return { result: cachedTest[0] };
 		}
 
-		for (let i = 0; i < count; i++) {}
-		await this.redisService.setItemCache<number>(cacheKey, [count]);
+		// for (let i = 0; i < count; i++) {}
+		const result = slowFib(count);
+		console.log(result);
 
-		return { count };
+		await this.redisService.setItemCache<number>(cacheKey, [result]);
+
+		return { result };
 	}
 
 	async invalidateTestRedis(count: number = 0): Promise<{ count: number }> {

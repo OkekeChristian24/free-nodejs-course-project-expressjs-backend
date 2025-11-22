@@ -13,3 +13,8 @@ export const getErrorMessage = (error: unknown) => {
 
 	return "Sorry, something went wrong";
 };
+
+export const slowFib = (n: number): number => {
+	if (n <= 1) return n;
+	return slowFib(n - 1) + slowFib(n - 2);
+};

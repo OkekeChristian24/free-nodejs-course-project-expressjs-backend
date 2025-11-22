@@ -87,11 +87,13 @@ export class PostController {
 		try {
 			const { count } = req.params;
 			const countNum = Number(count);
-			await this.postService.testRedis(countNum);
+			const { result } = await this.postService.testRedis(countNum);
+			console.log("RES = ", result);
 
-			return res
-				.status(200)
-				.json({ data: countNum, message: `Counted to ${countNum}` });
+			return res.status(200).json({
+				data: countNum,
+				message: `Fibonacci of ${countNum} is ${result}`,
+			});
 		} catch (error) {
 			next(error);
 		}
