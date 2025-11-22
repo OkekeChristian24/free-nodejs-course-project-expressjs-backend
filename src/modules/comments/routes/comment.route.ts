@@ -10,12 +10,15 @@ import {
 	updateCommentValidator,
 } from "../../../common/validators/comment.validator";
 import { validate } from "../../../common/middlewares/validate.middleware";
+import { RedisService } from "../../../providers/redis.provider";
+import redis from "../../../configs/redis.config";
 
 // mergeParams - for nesting APIs
 const router = Router({ mergeParams: true });
 
 const userService = new UserService(pool);
-const postService = new PostService(pool);
+const redisService = new RedisService(redis);
+const postService = new PostService(pool, redisService);
 const commentService = new CommentService(postService, userService, pool);
 const commentController = new CommentController(commentService);
 

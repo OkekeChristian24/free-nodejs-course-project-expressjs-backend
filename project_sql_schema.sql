@@ -1,11 +1,12 @@
+-- Create a database
+CREATE DATABASE my_blog;
+
 -- Create user and grant privileges 
 CREATE USER 'blog_user'@'localhost' IDENTIFIED BY 'password1';
 GRANT ALL PRIVILEGES ON my_blog.* TO 'blog_user'@'localhost';
 FLUSH PRIVILEGES;
 SELECT User, Host FROM mysql.user;
 
-
-CREATE DATABASE my_blog;
 
 USE my_blog;
 

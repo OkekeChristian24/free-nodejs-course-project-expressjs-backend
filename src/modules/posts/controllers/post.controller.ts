@@ -27,7 +27,7 @@ export class PostController {
 	async getAllPosts(req: Request, res: Response, next: NextFunction) {
 		try {
 			const page = Number(req.query.page as string) || 1;
-			const limit = Number(req.query.limit as string) || 20;
+			const limit = Number(req.query.limit as string) || 50;
 			const posts = await this.postService.getAllPosts(page, limit);
 			return res.status(200).json({ data: posts });
 		} catch (error) {
@@ -77,6 +77,36 @@ export class PostController {
 			);
 
 			return res.status(201).json({ data: result, message: "Post deleted" });
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	// GET /posts/redis-test/:count
+	async testRedis(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { count } = req.params;
+			const countNum = Number(count);
+			await this.postService.testRedis(countNum);
+
+			return res
+				.status(200)
+				.json({ data: countNum, message: `Counted to ${countNum}` });
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	async invalidateTestRedis(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { count } = req.params;
+			const countNum = Number(count);
+			await this.postService.invalidateTestRedis(countNum);
+
+			return res.status(200).json({
+				data: countNum,
+				message: ` ${count ? "Count " + count : "All counts"} invalidated`,
+			});
 		} catch (error) {
 			next(error);
 		}

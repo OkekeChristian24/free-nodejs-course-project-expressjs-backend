@@ -50,8 +50,9 @@ export const errorHandler = (
 	res: Response,
 	next: NextFunction,
 ) => {
+	console.error(err);
+
 	if (res.headersSent || appConfig.debug) {
-		console.error(err);
 		next(err);
 		return;
 	}

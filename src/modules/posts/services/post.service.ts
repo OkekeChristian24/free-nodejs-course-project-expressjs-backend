@@ -9,9 +9,10 @@ import {
 } from "../../../common/exceptions";
 import { ExceptionMessages } from "../../../common/messages/exception.message";
 import { CaseCasted } from "../../../common/constants/variables";
+import { RedisService } from "../../../providers/redis.provider";
 
 export class PostService {
-	constructor(private pool: Pool) {}
+	constructor(private pool: Pool, private redisService: RedisService) {}
 
 	// Create a post
 	async createPost(
@@ -25,6 +26,10 @@ export class PostService {
 			[title, content, user.id],
 		);
 		const insertResult = result as ResultSetHeader;
+
+		const cacheKey = `post:page:*`;
+		await this.redisService.invalidateListCache(cacheKey);
+
 		const post = await this.getPostById(insertResult.insertId);
 		return post;
 	}
@@ -45,10 +50,19 @@ export class PostService {
 	// Get all posts
 	async getAllPosts(page: number, limit: number): Promise<Post[]> {
 		const offset = (page - 1) * limit;
+
+		const cacheKey = `post:page:${page}:limit:${limit}`;
+		const cachedPosts = await this.redisService.getCachedItem<Post>(cacheKey);
+		if (cachedPosts) {
+			return cachedPosts;
+		}
+
 		const [posts] = await this.pool.query<Post[]>(
 			"SELECT p.`id`, p.`title`, p.`content`, p.`user_id` as author_id, p.`created_at` as created_at, p.`updated_at` as updated_at, u.`name` as author_name, u.`email` as author_email FROM `post` p LEFT JOIN `user` u ON p.`user_id` = u.`id` ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			[limit, offset],
 		);
+
+		await this.redisService.setItemCache(cacheKey, posts);
 
 		return posts;
 	}
@@ -84,12 +98,18 @@ export class PostService {
 			"UPDATE `post` SET " + updates.join(", ") + " WHERE `id` = ? LIMIT 1";
 		await this.pool.execute(sql, params);
 
+		const cacheKey = `post:page:*`;
+		await this.redisService.invalidateListCache(cacheKey);
+
 		const updatedPost = await this.getPostById(id);
 		return updatedPost;
 	}
 
 	// Delete a post
-	async deletePost(id: number, user: AuthenticatedUser) {
+	async deletePost(
+		id: number,
+		user: AuthenticatedUser,
+	): Promise<{ id: number }> {
 		// It will abort if post does not exist
 		const post = await this.getPostById(id);
 
@@ -99,6 +119,30 @@ export class PostService {
 		}
 
 		await this.pool.execute("DELETE FROM `post` WHERE `id` = ?", [id]);
+
+		const cacheKey = `post:page:*`;
+		await this.redisService.invalidateListCache(cacheKey);
+
 		return { id };
+	}
+
+	async testRedis(count: number): Promise<{ count: number }> {
+		const cacheKey = `test:${count}`;
+		const cachedTest = await this.redisService.getCachedItem<number>(cacheKey);
+		if (cachedTest) {
+			return { count: cachedTest[0] };
+		}
+
+		for (let i = 0; i < count; i++) {}
+		await this.redisService.setItemCache<number>(cacheKey, [count]);
+
+		return { count };
+	}
+
+	async invalidateTestRedis(count: number = 0): Promise<{ count: number }> {
+		const cacheKey = `test:${count == 0 ? "*" : count}`;
+		await this.redisService.invalidateListCache(cacheKey);
+
+		return { count };
 	}
 }
