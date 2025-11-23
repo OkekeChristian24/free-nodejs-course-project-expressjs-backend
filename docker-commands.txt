@@ -141,3 +141,11 @@ docker compose -f docker-compose.dev.yml up
 13. Compose with Environment File
 (compose automatically loads .env in the same dir)
 ENV_FILE=myvars.env docker compose up -d
+
+14. Deploy Docker image to Docker Hub
+# Login to Docker account on Docker Hub
+docker login
+
+docker tag <image-name> <docker-account-username>/<image-name-to-use>:<image-tag-to-use>
+
+docker push <docker-account-username>/<image-name-to-use>:<image-tag-to-use>
