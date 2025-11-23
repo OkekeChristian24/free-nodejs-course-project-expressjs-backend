@@ -146,6 +146,8 @@ ENV_FILE=myvars.env docker compose up -d
 # Login to Docker account on Docker Hub
 docker login
 
+# Tag the your Docker image
 docker tag <image-name> <docker-account-username>/<image-name-to-use>:<image-tag-to-use>
 
+# Push the your Docker image to Docker Hub
 docker push <docker-account-username>/<image-name-to-use>:<image-tag-to-use>
