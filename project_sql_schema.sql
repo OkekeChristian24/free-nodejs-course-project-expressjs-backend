@@ -67,3 +67,18 @@ CREATE TABLE comment (
 -- So you can efficiently fetch comment (all) for a post and order by created_at
 CREATE INDEX idx_comment_post_id_created_at ON comment(post_id, created_at);
 
+-- KAFKA LECTURE
+-- Create news table
+CREATE TABLE IF NOT EXISTS news (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  publisher VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+ALTER TABLE news
+  ADD INDEX idx_news_id (id),
+  ADD INDEX idx_news_created_at (created_at),
+  ADD INDEX idx_news_publisher (publisher);

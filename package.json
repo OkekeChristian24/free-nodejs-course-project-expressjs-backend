@@ -4,9 +4,15 @@
 	"main": "dist/server.js",
 	"scripts": {
 		"dev": "npx ts-node-dev --files src/server.ts",
-		"start": "node dist/server.js",
+		"dev:all": "docker compose -f docker-compose.dev.yml up -d && npx ts-node-dev --files src/server.ts",
+		"start": "rm -rf dist && tsc && node dist/server.js",
+		"start:all": "rm -rf dist && tsc && docker compose up -f docker-compose.prod.yml -d && node dist/server.js",
 		"build": "rm -rf dist && tsc",
 		"type-check": "npx tsc --noEmit",
+		"docker:dev:up": "docker compose -f docker-compose.dev.yml up -d",
+		"docker:prod:up": "docker compose -f docker-compose.prod.yml up -d",
+		"docker:dev:down": "docker compose -f docker-compose.dev.yml down",
+		"docker:prod:down": "docker compose -f docker-compose.prod.yml down",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
@@ -21,6 +27,7 @@
 		"express-validator": "^7.2.1",
 		"ioredis": "^5.8.2",
 		"jsonwebtoken": "^9.0.2",
+		"kafkajs": "^2.2.4",
 		"mysql2": "^3.14.3"
 	},
 	"devDependencies": {
