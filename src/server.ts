@@ -29,21 +29,7 @@ app.listen(appConfig.port, async () => {
 		} catch (err) {
 			console.error("Failed to initialize Kafka services:", err);
 		}
-	}, 2000);
-
-	// Start Kafka producer
-	// (async () => {
-	// 	const producer = NewsProducer.getInstance();
-	// 	await producer.connect();
-	// 	console.log("Kafka producer connected");
-	// })().catch((err) => {
-	// 	console.error("Failed to connect Kafka producer:", err);
-	// });
-	// Start Kafka consumer
-	// runConsumer().catch((err) => {
-	// 	console.error("News consumer error:", err);
-	// 	process.exit(1);
-	// });
+	}, 4000);
 });
 
 process.on("SIGTERM", async () => {

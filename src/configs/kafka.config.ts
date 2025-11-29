@@ -1,6 +1,7 @@
-import { Kafka, Partitioners } from "kafkajs";
+import { Kafka } from "kafkajs";
 
 const nodeEnv = process.env.NODE_ENV || "development";
+
 function resolveDefaultBrokers(): string[] {
 	if (process.env.KAFKA_BROKERS) {
 		return process.env.KAFKA_BROKERS.split(",");
@@ -16,10 +17,8 @@ function resolveDefaultBrokers(): string[] {
 const brokers = resolveDefaultBrokers();
 
 const kafka = new Kafka({
-	// clientId: process.env.KAFKA_CLIENT_ID || "news-data",
-	// brokers,
-	//  clientId: "news-data",
-	brokers: ["localhost:9092"],
+	clientId: process.env.KAFKA_CLIENT_ID || "news-data",
+	brokers,
 });
 
 export const KAFKA_TOPIC = process.env.KAFKA_TOPIC || "news-ingest";
